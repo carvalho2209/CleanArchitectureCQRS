@@ -10,12 +10,11 @@ Presentation
 Each of the layers is typically one project in your solution.
 
 Domain Layer:
+The Domain layer sits at the core of the Clean Architecture. 
+Here we define things like: entities, value objects, aggregates, domain events, exceptions, repository interfaces, etc.
 
-The Domain layer sits at the core of the Clean Architecture. Here we define things like: entities, value objects, aggregates, domain events, exceptions, repository interfaces, etc.
+Application Layer:
 
-
-:
-Application Layer
 The Application layer sits right above the Domain layer. It acts as an orchestrator for the Domain layer, containing the most important use cases in your application.
 You can structure your use cases using services or using commands and queries.
 I'm a big fan of the CQRS pattern, so I like to use the command and query approach.
