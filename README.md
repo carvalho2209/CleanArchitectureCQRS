@@ -1,4 +1,4 @@
-# Clean Architecture With .NET 8 And CQRS
+# Clean Architecture With .NET 8, CQRS And MediatR
 
 How To Approach Clean Architecture Folder Structure
 
