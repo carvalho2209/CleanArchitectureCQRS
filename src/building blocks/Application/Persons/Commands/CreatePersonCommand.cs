@@ -1,6 +1,7 @@
-﻿using Domain.Abstractions;
+﻿using Application.Repositories;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Persons.Commands;
 
@@ -11,16 +12,29 @@ public sealed class CreatePersonCommand(Guid? id, DateTime dateOfBirth, string n
     public string Name { get; } = name;
     public string SocialNumber { get; } = socialNumber;
 
-    public class Handler(IUnitOfWork unitOfWork, IPersonRepository personRepository) : IRequestHandler<CreatePersonCommand, Guid>
+    public class Handler(IUnitOfWork unitOfWork) : IRequestHandler<CreatePersonCommand, Guid>
     {
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
         public async Task<Guid> Handle(CreatePersonCommand request, CancellationToken cancellationToken)
         {
-            var person = new Person(Guid.NewGuid(), request.DateOfBirth, request.Name, request.SocialNumber);
+            if (request.Id.HasValue && await _unitOfWork.Persons.AnyAsync(x=>x.Id == request.Id.Value, cancellationToken))
+            {
+                throw new ArgumentException($"The Person with Id {request.Id} already exists.");
+            }
 
-             personRepository.Insert(person);
-             await unitOfWork.SaveChangesAsync(cancellationToken);
-             
-             return person.Id;
+            var person = new Person
+            {
+                Id = request.Id.GetValueOrDefault(Guid.NewGuid()),
+                Name = request.Name,
+                SocialNumber = request.SocialNumber,
+                DateOfBirth = request.DateOfBirth,
+            };
+
+            await unitOfWork.Persons.AddAsync(person, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return person.Id;
         }
     }
 }

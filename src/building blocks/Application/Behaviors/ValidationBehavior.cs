@@ -1,16 +1,14 @@
-﻿using Application.Abstractions.Messaging;
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
 using ValidationException = Application.Exceptions.ValidationException;
 
 namespace Application.Behaviors;
 
-public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+public sealed class ValidationBehavior<TRequest, TResponse>
+    (IEnumerable<IValidator<TRequest>> validators) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : class, IRequest<TResponse>
 {
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
-
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators) => _validators = validators;
+    private readonly IEnumerable<IValidator<TRequest>> _validators = validators;
 
     public async Task<TResponse> Handle(
         TRequest request,
